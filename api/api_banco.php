@@ -32,21 +32,21 @@ $request_method = $_SERVER["REQUEST_METHOD"];
 switch ($request_method) {
     case 'GET': // Consulta os registros
 
-        $nome = $_GET['nome'] ?? 'Não informado';
-        $email = $_GET['email'] ?? 'Não informado';
-        echo json_encode([
-            'nome' => $nome,
-            'email' => $email
-        ]);
+        $id = $_GET['id'] ?? 'Não informado';
 
-        if ($nome == 'Não informado' || $email == 'Nao informado') {
+        if ($id == 'Não informado') {
             $query = "SELECT * FROM users";
             $stmt = $conn->prepare($query);
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } else {
-            echo("jjjj");
+            $query = "SELECT * FROM users where id = :id";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(":id", $id);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($result);
         }
 
         break;
@@ -72,6 +72,53 @@ switch ($request_method) {
         if ($stmt->execute()) {
             echo json_encode(["message" => "Registro atualizado com sucesso!"]);
         }
+        break;
+
+    case 'PATCH':
+        $data = json_decode(file_get_contents("php://input"), true);
+    
+        if (!isset($data['id'])) {
+            http_response_code(400);
+            echo json_encode(["error" => "ID do usuário é obrigatório"]);
+            break;
+        }
+        
+        // Construir a query dinamicamente com apenas os campos fornecidos
+        $fields = [];
+        $params = [':id' => $data['id']];
+        
+        if (isset($data['nome'])) {
+            $fields[] = "nome = :nome";
+            $params[':nome'] = $data['nome'];
+        }
+        
+        if (isset($data['email'])) {
+            $fields[] = "email = :email";
+            $params[':email'] = $data['email'];
+        }
+        
+        // Se nenhum campo válido foi fornecido
+        if (empty($fields)) {
+            http_response_code(400);
+            echo json_encode(["error" => "Nenhum campo válido para atualização"]);
+            break;
+        }
+        
+        $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
+        $stmt = $conn->prepare($query);
+        
+        // Bind dos parâmetros
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Registro atualizado com sucesso!"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["error" => "Erro ao atualizar registro"]);
+        }
+
         break;
 
     case 'DELETE': // Exclui um registro
