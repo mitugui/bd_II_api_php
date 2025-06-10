@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   apache-php:
-    image: php:8.2-apache
+    build: .
+    # image: php:8.2-apache
     container_name: api-php
     volumes:
       - ./api:/var/www/html
@@ -26,6 +27,7 @@ services:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./initdb:/docker-entrypoint-initdb.d
     networks:
       - rede
 

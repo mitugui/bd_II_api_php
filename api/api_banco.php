@@ -31,11 +31,24 @@ $request_method = $_SERVER["REQUEST_METHOD"];
 
 switch ($request_method) {
     case 'GET': // Consulta os registros
-        $query = "SELECT * FROM users";
-        $stmt = $conn->prepare($query);
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($result);
+
+        $nome = $_GET['nome'] ?? 'Não informado';
+        $email = $_GET['email'] ?? 'Não informado';
+        echo json_encode([
+            'nome' => $nome,
+            'email' => $email
+        ]);
+
+        if ($nome == 'Não informado' || $email == 'Nao informado') {
+            $query = "SELECT * FROM users";
+            $stmt = $conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($result);
+        } else {
+            echo("jjjj");
+        }
+
         break;
 
     case 'POST': // Insere um novo registro
