@@ -1,37 +1,15 @@
 <?php
+
+require_once 'config/Database.php';
+
 header("Content-Type: application/json");
 
-class Database {
-    private $host = "mysql";
-    private $db_name = "api";
-    private $username = "user";
-    private $password = "senha";
-    public $conn;
-
-    public function getConnection() {
-        $this->conn = null;
-
-        try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, 
-                                  $this->username, 
-                                  $this->password);
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch(PDOException $exception) {
-            echo json_encode(["error" => "Erro de conexão: " . $exception->getMessage()]);
-            exit;
-        }
-
-        return $this->conn;
-    }
-}
-
-$conn = (new Database())->getConnection();
+$conn = Database::getConnection();
 
 $request_method = $_SERVER["REQUEST_METHOD"];
 
 switch ($request_method) {
-    case 'GET': // Consulta os registros
-
+    case 'GET':
         $id = $_GET['id'] ?? 'Não informado';
 
         if ($id == 'Não informado') {
@@ -51,7 +29,7 @@ switch ($request_method) {
 
         break;
 
-    case 'POST': // Insere um novo registro
+    case 'POST':
         $data = json_decode(file_get_contents("php://input"), true);
         $query = "INSERT INTO users (nome, email) VALUES (:nome, :email)";
         $stmt = $conn->prepare($query);
@@ -62,7 +40,7 @@ switch ($request_method) {
         }
         break;
 
-    case 'PUT': // Atualiza um registro existente
+    case 'PUT':
         $data = json_decode(file_get_contents("php://input"), true);
         $query = "UPDATE users SET nome = :nome, email = :email WHERE id = :id";
         $stmt = $conn->prepare($query);
@@ -83,7 +61,6 @@ switch ($request_method) {
             break;
         }
         
-        // Construir a query dinamicamente com apenas os campos fornecidos
         $fields = [];
         $params = [':id' => $data['id']];
         
@@ -97,7 +74,6 @@ switch ($request_method) {
             $params[':email'] = $data['email'];
         }
         
-        // Se nenhum campo válido foi fornecido
         if (empty($fields)) {
             http_response_code(400);
             echo json_encode(["error" => "Nenhum campo válido para atualização"]);
@@ -107,7 +83,6 @@ switch ($request_method) {
         $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
         $stmt = $conn->prepare($query);
         
-        // Bind dos parâmetros
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
@@ -121,7 +96,7 @@ switch ($request_method) {
 
         break;
 
-    case 'DELETE': // Exclui um registro
+    case 'DELETE':
         $data = json_decode(file_get_contents("php://input"), true);
         $query = "DELETE FROM users WHERE id = :id";
         $stmt = $conn->prepare($query);
