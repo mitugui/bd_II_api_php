@@ -13,13 +13,13 @@ switch ($request_method) {
         $id = $_GET['id'] ?? 'Não informado';
 
         if ($id == 'Não informado') {
-            $query = "SELECT * FROM users";
+            $query = "SELECT * FROM users WHERE deleted_at IS NULL";
             $stmt = $conn->prepare($query);
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($result);
         } else {
-            $query = "SELECT * FROM users where id = :id";
+            $query = "SELECT * FROM users where id = :id AND deleted_at IS NULL";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(":id", $id);
             $stmt->execute();
@@ -42,7 +42,7 @@ switch ($request_method) {
 
     case 'PUT':
         $data = json_decode(file_get_contents("php://input"), true);
-        $query = "UPDATE users SET nome = :nome, email = :email WHERE id = :id";
+        $query = "UPDATE users SET nome = :nome, email = :email WHERE id = :id AND deleted_at IS NULL";
         $stmt = $conn->prepare($query);
         $stmt->bindParam(":nome", $data["nome"]);
         $stmt->bindParam(":email", $data["email"]);
@@ -80,7 +80,7 @@ switch ($request_method) {
             break;
         }
         
-        $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
+        $query = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id AND deleted_at IS NULL";
         $stmt = $conn->prepare($query);
         
         foreach ($params as $key => $value) {
@@ -98,7 +98,7 @@ switch ($request_method) {
 
     case 'DELETE':
         $data = json_decode(file_get_contents("php://input"), true);
-        $query = "DELETE FROM users WHERE id = :id";
+        $query = "UPDATE users SET deleted_at = NOW() WHERE id = :id";
         $stmt = $conn->prepare($query);
         $stmt->bindParam(":id", $data["id"]);
         if ($stmt->execute()) {
