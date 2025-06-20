@@ -2,17 +2,26 @@
 
 namespace CoMit\ApiBd\Config;
 
+use Dotenv\Dotenv;
 use PDO;
 use PDOException;
 
 class Database {
-    private static $host = "mysql";
-    private static $db_name = "api";
-    private static $username = "user";
-    private static $password = "senha";
+    private static $host;
+    private static $db_name;
+    private static $username;
+    private static $password;
     private static $conn = null;
 
     public static function getConnection() {
+        $dotenv = Dotenv::createImmutable(dirname(__DIR__, 2)); 
+        $dotenv->load();
+        
+        self::$host = $_ENV['DB_HOST'];
+        self::$db_name = $_ENV['DB_NAME'];
+        self::$username = $_ENV['DB_USER'];
+        self::$password = $_ENV['DB_PASSWORD'];
+
         if (self::$conn === null) {
             try {
                 self::$conn = new PDO(
