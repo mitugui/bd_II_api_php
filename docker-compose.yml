@@ -5,10 +5,7 @@ services:
     build: .
     container_name: api-php
     volumes:
-      - ./public:/var/www/html
-      - ./vendor:/var/www/html/vendor
-      - ./src:/var/www/html/src
-      - ./.env:/var/www/html/.env
+      - .:/var/www/html
     ports:
       - "8080:80"
     depends_on:

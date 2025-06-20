@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use CoMit\ApiBd\Config\Database;
 use CoMit\ApiBd\Controllers\UserController;
