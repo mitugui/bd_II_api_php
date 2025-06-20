@@ -3,10 +3,11 @@ version: '3.8'
 services:
   apache-php:
     build: .
-    # image: php:8.2-apache
     container_name: api-php
     volumes:
-      - ./api:/var/www/html
+      - ./public:/var/www/html
+      - ./vendor:/var/www/html/vendor
+      - ./src:/var/www/html/src
     ports:
       - "8080:80"
     depends_on:

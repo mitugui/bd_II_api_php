@@ -1,7 +1,9 @@
 <?php
 
-require_once 'config/Database.php';
-require_once 'controllers/UserController.php';
+require __DIR__ . '/vendor/autoload.php';
+
+use CoMit\ApiBd\Config\Database;
+use CoMit\ApiBd\Controllers\UserController;
 
 header("Content-Type: application/json");
 

@@ -1,0 +1,15 @@
+{
+    "name": "co-mit/api-bd",
+    "autoload": {
+        "psr-4": {
+            "CoMit\\ApiBd\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mitugui",
+            "email": "cristian.mitugui04@gmail.com"
+        }
+    ],
+    "require": {}
+}

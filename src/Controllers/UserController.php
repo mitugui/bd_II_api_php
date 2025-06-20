@@ -1,5 +1,9 @@
 <?php
 
+namespace CoMit\ApiBd\Controllers;
+
+use PDO;
+
 class UserController
 {
     private $conn;

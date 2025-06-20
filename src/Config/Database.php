@@ -1,5 +1,10 @@
 <?php
 
+namespace CoMit\ApiBd\Config;
+
+use PDO;
+use PDOException;
+
 class Database {
     private static $host = "mysql";
     private static $db_name = "api";
