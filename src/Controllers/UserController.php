@@ -14,7 +14,7 @@ class UserController
 
     public function getAll()
     {
-        $query = "SELECT * FROM users WHERE deleted_at IS NULL";
+        $query = "SELECT id, nome, email, created_at, updated_at, deleted_at FROM users WHERE deleted_at IS NULL";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -23,7 +23,7 @@ class UserController
 
     public function find($id)
     {
-        $query = "SELECT * FROM users where id = :id AND deleted_at IS NULL";
+        $query = "SELECT id, nome, email, created_at, updated_at, deleted_at FROM users where id = :id AND deleted_at IS NULL";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
         $stmt->execute();
@@ -34,27 +34,43 @@ class UserController
     public function post()
     {
         $data = json_decode(file_get_contents("php://input"), true);
-        $query = "INSERT INTO users (nome, email) VALUES (:nome, :email)";
+        $query = "INSERT INTO users (nome, email, senha) VALUES (:nome, :email, :senha)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":nome", $data["nome"]);
         $stmt->bindParam(":email", $data["email"]);
+        $password_hash = password_hash($data["senha"], PASSWORD_BCRYPT);
+        $stmt->bindParam(":senha", $password_hash);
+
         if ($stmt->execute()) {
             echo json_encode(["message" => "Registro inserido com sucesso!"]);
-        } 
+        }
     }
     
     public function put()
     {
         $data = json_decode(file_get_contents("php://input"), true);
-        $query = "UPDATE users SET nome = :nome, email = :email WHERE id = :id AND deleted_at IS NULL";
+
+        $fields = "nome = :nome, email = :email";
+        if (isset($data["senha"])) {
+            $fields .= ", senha = :senha";
+        }
+
+        $query = "UPDATE users SET $fields WHERE id = :id AND deleted_at IS NULL";
         $stmt = $this->conn->prepare($query);
+
         $stmt->bindParam(":nome", $data["nome"]);
         $stmt->bindParam(":email", $data["email"]);
+        if (isset($data["senha"])) {
+            $senha = password_hash($data["senha"], PASSWORD_BCRYPT);
+            $stmt->bindParam(":senha", $senha);
+        }
         $stmt->bindParam(":id", $data["id"]);
+
         if ($stmt->execute()) {
             echo json_encode(["message" => "Registro atualizado com sucesso!"]);
         }
     }
+
 
     public function patch()
     {
