@@ -11,14 +11,29 @@ class Jwt
         return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($text));
     }
 
-    public function encode(array $payload): string
+    private function base64URLDecode(string $data): string
+    {
+        $remainder = strlen($data) % 4;
+        if ($remainder) {
+            $data .= str_repeat('=', 4 - $remainder);
+        }
+        $data = str_replace(['-', '_'], ['+', '/'], $data);
+        return base64_decode($data);
+    }
+
+    public function encode(array $payload, int $expiresIn): string
     {
         $header = json_encode([
             "alg" => "HS256",
             "typ" => "JWT"
         ]);
 
+        if ($expiresIn <= 0) {
+            $expiresIn = 600;
+        }
+
         $header = $this->base64URLEncode($header);
+        $payload['exp'] = time() + $expiresIn;
         $payload = json_encode($payload);
         $payload = $this->base64URLEncode($payload);
 
@@ -38,6 +53,13 @@ class Jwt
         $expected = $this->base64URLEncode(
             hash_hmac("sha256", "$header.$payload", $this->key, true)
         );
+
+        $decodedPayloadJson = $this->base64URLDecode($payload);
+        $decodedPayload = json_decode($decodedPayloadJson, true);
+
+        if (isset($decodedPayload['exp']) && time() > $decodedPayload['exp']) {
+            return false;
+        }
 
         return hash_equals($expected, $signature);
     }
