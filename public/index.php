@@ -62,35 +62,35 @@ if ($resources[0] === "login") {
 }
 
 if ($resources[0] === "users") {
-    $userId = AuthMiddleware::authenticate();
+    if ($method === "POST") {
+        $userController->post();
+    } else {
+        $userId = AuthMiddleware::authenticate();
 
-    switch ($method) {
-        case "GET":
-            $id = $_GET['id'] ?? null;
-            if (!isset($id)) {
-                $userController->getAll();
-            } else {
-                $userController->find($id);
-            }
-            break;
+        switch ($method) {
+            case "GET":
+                $id = $_GET['id'] ?? null;
+                if (!isset($id)) {
+                    $userController->getAll();
+                } else {
+                    $userController->find($id);
+                }
+                break;
 
-        case "POST":
-            $userController->post();
-            break;
+            case "PUT":
+                $userController->put($userId);
+                break;
 
-        case "PUT":
-            $userController->put($userId);
-            break;
+            case "PATCH":
+                $userController->patch($userId);
+                break;
 
-        case "PATCH":
-            $userController->patch($userId);
-            break;
+            case "DELETE":
+                $userController->delete($userId);
+                break;
 
-        case "DELETE":
-            $userController->delete($userId);
-            break;
-
-        default:
-            echo json_encode(["error" => "Método de requisição inválido"]);
+            default:
+                echo json_encode(["error" => "Método de requisição inválido"]);
+        }
     }
 }
