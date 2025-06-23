@@ -20,6 +20,11 @@ Trata-se de uma **API RESTful em PHP puro (sem framework)**, com suporte a auten
 
 ---
 
+## Cliente Front End
+- Aplicação em [https://github.com/yoshimidevz/client-api-react](https://github.com/yoshimidevz/client-api-react)
+
+---
+
 ## Tecnologias Utilizadas
 
 - **PHP 8.2**
