@@ -6,7 +6,7 @@ use CoMit\ApiBd\Jwt\Jwt;
 
 class AuthMiddleware
 {
-    public static function authenticate(): void
+    public static function authenticate(): int
     {
         $headers = getallheaders();
 
@@ -30,5 +30,7 @@ class AuthMiddleware
             echo json_encode(["message" => "Token inválido"]);
             exit;
         }
+
+        return $jwt->getIdFromPayload($token);
     }
 }

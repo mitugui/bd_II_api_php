@@ -46,10 +46,16 @@ class UserController
         }
     }
     
-    public function put()
+    public function put($userId)
     {
         $data = json_decode(file_get_contents("php://input"), true);
-
+    
+        if ($userId != $data['id']) {
+            http_response_code(403);
+            echo json_encode(["error" => "Você não tem permissão para modificar este recurso"]);
+            exit;
+        }
+        
         $fields = "nome = :nome, email = :email";
         if (isset($data["senha"])) {
             $fields .= ", senha = :senha";
@@ -72,9 +78,15 @@ class UserController
     }
 
 
-    public function patch()
+    public function patch($userId)
     {
         $data = json_decode(file_get_contents("php://input"), true);
+    
+        if ($userId != $data['id']) {
+            http_response_code(403);
+            echo json_encode(["error" => "Você não tem permissão para modificar este recurso"]);
+            exit;
+        }
     
         if (!isset($data['id'])) {
             http_response_code(400);
@@ -114,9 +126,16 @@ class UserController
         }      
     }
 
-    public function delete()
+    public function delete($userId)
     {
         $data = json_decode(file_get_contents("php://input"), true);
+    
+        if ($userId != $data['id']) {
+            http_response_code(403);
+            echo json_encode(["error" => "Você não tem permissão para modificar este recurso"]);
+            exit;
+        }
+        
         $query = "UPDATE users SET deleted_at = NOW() WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $data["id"]);

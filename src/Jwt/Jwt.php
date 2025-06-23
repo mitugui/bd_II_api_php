@@ -63,4 +63,15 @@ class Jwt
 
         return hash_equals($expected, $signature);
     }
+
+    public function getIdFromPayload(string $token): int
+    {
+        $parts = explode('.', $token);
+
+        $payloadBase64 = $parts[1];
+        $payloadJson = $this->base64URLDecode($payloadBase64);
+        $payload = json_decode($payloadJson, true);
+
+        return $payload['id'];
+    }
 }

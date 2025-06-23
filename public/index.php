@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';    
 
 use CoMit\ApiBd\Config\Database;
 use CoMit\ApiBd\Controllers\UserController;
@@ -24,7 +24,7 @@ $method = $_SERVER["REQUEST_METHOD"];
 $uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 $resources = explode('/', trim($uri, '/'));
 
-$tokenExpirationTimeInSeconds = 6000;
+$tokenExpirationTimeInSeconds = 3600;
 
 if ($resources[0] === "login") {
     if ($method === "POST") {
@@ -62,7 +62,7 @@ if ($resources[0] === "login") {
 }
 
 if ($resources[0] === "users") {
-    AuthMiddleware::authenticate();
+    $userId = AuthMiddleware::authenticate();
 
     switch ($method) {
         case "GET":
@@ -79,15 +79,15 @@ if ($resources[0] === "users") {
             break;
 
         case "PUT":
-            $userController->put();
+            $userController->put($userId);
             break;
 
         case "PATCH":
-            $userController->patch();
+            $userController->patch($userId);
             break;
 
         case "DELETE":
-            $userController->delete();
+            $userController->delete($userId);
             break;
 
         default:
